@@ -1,7 +1,7 @@
 PyRelayCtl
 ==========
 
-PyRelayCtl is a library to control FTDI FT245R based relay board.
+PyRelayCtl is a library to control FTDI FT245R based relay boards.
 This includes the SainSmart 4-channel 5V USB relay board.
 The outlets can be switched on and off via USB.
 
@@ -14,7 +14,7 @@ On Debian PyUSB can be installed using::
 Examples
 --------
 
-relctl.py is a command line tool to control attached relay cards.
+relctl.py is a command line tool to control attached relay boards.
 
 printenv.py shows how to use the library to switch on a computer, read the
 U-Boot environment variables and then switch it off again.

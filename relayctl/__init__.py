@@ -25,7 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """PyRelayCtl
-PyRelayCtl is a library to control FTDI FT245R based relay board.
+PyRelayCtl is a library to control FTDI FT245R based relay boards.
 This includes the SainSmart 4-channel 5V USB relay board.
 The outlets can be switched on and off via USB.
 
