@@ -28,7 +28,7 @@ library also only works as root.
 To allow group relayctl access create file /lib/udev/rules.d/60-relayctl.rules
 with the following content::
 
-    SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", GROUP="dialout", MODE="660", ENV{MODALIAS}="ignore"
+    SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", GROUP="relayctl", MODE="660", ENV{MODALIAS}="ignore"
 
 Then reload the udev rules with::
 
