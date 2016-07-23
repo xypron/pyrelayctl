@@ -67,6 +67,7 @@ def getid(dev):
 	""" 
 	Gets the id of a device.
 
+	@param dev: device
 	@return: id
 	"""
 
@@ -81,6 +82,7 @@ def getmaxport(dev):
 	""" 
 	Gets the maximum outlet number of a device.
 
+	@param dev: device
 	@return: maximum outlet number
 	"""
 
@@ -90,6 +92,7 @@ def getminport(dev):
 	""" 
 	Gets the minimum outlet number of a device.
 
+	@param dev: device
 	@return: minimum outlet number
 	"""
 
@@ -111,14 +114,12 @@ def getstatus(dev, i):
 	# Set bitbang mode
 	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
 	if ret < 0:
-		# Put error handling here
-		return -1
+		raise RuntimeError("relayctl: failure to set bitbang mode")
 
 	# Read status
 	buf = dev.ctrl_transfer(0xC0, 0x0c, 0x0000, 0x01, buf, 500)
 	if len(buf) == 0:
-		# Put error handling here
-		return -1
+		raise RuntimeError("relayctl: failure to read status")
 	
 	if (1 << (i - 1)) & buf[0]:
 		ret = 1
@@ -142,19 +143,19 @@ def switchoff(dev, i):
 	# Set bitbang mode
 	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
 	if ret < 0:
-		# Put error handling here
-		return -1
+		raise RuntimeError("relayctl: failure to set bitbang mode")
 
 	# Read status
 	buf = dev.ctrl_transfer(0xC0, 0x0c, 0x0000, 0x01, buf, 500)
 	if len(buf) == 0:
-		# Put error handling here
-		return -1
+		raise RuntimeError("relayctl: failure to read status")
 	
 	buf[0] &= ~(1 << (i - 1))
 
 	# Write status
 	ret = dev.write(0x02, buf, 500)
+	if ret < 0:
+		raise RuntimeError("relayctl: failure to write status")
 
 	return
 
@@ -173,18 +174,18 @@ def switchon(dev, i):
 	# Set bitbang mode
 	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
 	if ret < 0:
-		# Put error handling here
-		return -1
+		raise RuntimeError("relayctl: failure to set bitbang mode")
 
 	# Read status
 	buf = dev.ctrl_transfer(0xC0, 0x0c, 0x0000, 0x01, buf, 500)
 	if len(buf) == 0:
-		# Put error handling here
-		return -1
+		raise RuntimeError("relayctl: failure to read status")
 	
 	buf[0] |= (1 << (i - 1))
 
 	# Write status
 	ret = dev.write(0x02, buf, 500)
+	if ret < 0:
+		raise RuntimeError("relayctl: failure to write status")
 
 	return
