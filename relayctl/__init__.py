@@ -63,6 +63,45 @@ def connect():
 		idVendor=0x0403, idProduct=0x6001))
 	return ret
 
+def disable(dev):
+	"""
+	Disables output to the device.
+	Attaches the kernel driver if available.
+
+	@param dev: device
+	"""
+
+	if dev.is_kernel_driver_active(0):
+		return
+	# Disable bitbang mode
+	ret = dev.ctrl_transfer(0x40, 0x0b, 0x0000, 0x01, None, 500)
+	if ret < 0:
+		raise RuntimeError("relayctl: failure to disable bitbang mode")
+	try:
+		dev.attach_kernel_driver(0)
+	except:
+		print ("relayctl: could not attach kernel driver")
+
+
+def enable(dev):
+	"""
+	Enables output to the device.
+
+	@param dev: device
+	"""
+
+	# Detach kernel driver	
+	if dev.is_kernel_driver_active(0):
+		try:
+			dev.detach_kernel_driver(0)
+		except:
+			raise RuntimeError(
+				"relayctl: failure to detach kernel driver")
+	# Enable bitbang mode
+	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
+	if ret < 0:
+		raise RuntimeError("relayctl: failure to enable bitbang mode")
+
 def getid(dev):
 	""" 
 	Gets the id of a device.
@@ -109,12 +148,9 @@ def getstatus(dev, i):
 
 	assert i >= getminport(dev) and i <= getmaxport(dev)
 
-	buf = bytes([0x00]);
+	enable(dev)
 
-	# Set bitbang mode
-	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
-	if ret < 0:
-		raise RuntimeError("relayctl: failure to set bitbang mode")
+	buf = bytes([0x00]);
 
 	# Read status
 	buf = dev.ctrl_transfer(0xC0, 0x0c, 0x0000, 0x01, buf, 500)
@@ -138,12 +174,9 @@ def switchoff(dev, i):
 
 	assert i >= getminport(dev) and i <= getmaxport(dev)
 
-	buf = bytes([0x00]);
+	enable(dev)
 
-	# Set bitbang mode
-	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
-	if ret < 0:
-		raise RuntimeError("relayctl: failure to set bitbang mode")
+	buf = bytes([0x00]);
 
 	# Read status
 	buf = dev.ctrl_transfer(0xC0, 0x0c, 0x0000, 0x01, buf, 500)
@@ -169,12 +202,9 @@ def switchon(dev, i):
 
 	assert i >= getminport(dev) and i <= getmaxport(dev)
 
-	buf = bytes([0x00]);
+	enable(dev)
 
-	# Set bitbang mode
-	ret = dev.ctrl_transfer(0x40, 0x0b, 0x01ff, 0x01, None, 500)
-	if ret < 0:
-		raise RuntimeError("relayctl: failure to set bitbang mode")
+	buf = bytes([0x00]);
 
 	# Read status
 	buf = dev.ctrl_transfer(0xC0, 0x0c, 0x0000, 0x01, buf, 500)

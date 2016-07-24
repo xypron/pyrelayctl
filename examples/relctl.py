@@ -44,6 +44,20 @@ def checkport(dev, p):
 		return False
 	return True
 
+def list(devices):
+	"""
+	List all devices.
+
+	@param devices list of devices
+	"""
+
+	print("Available devices");
+
+	for dev in devices:
+		print('device {}'.format(devices.index(dev)), end=", ")
+		# Print device id.
+		print('id {}'.format(relayctl.getid(dev)))
+
 def main():
 	# Find our devices
 	devices = relayctl.connect()
@@ -61,11 +75,16 @@ def main():
 
 	# Define command line options.
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "D:d:f:ho:t:")
+		opts, args = getopt.getopt(sys.argv[1:], "D:d:f:ghko:st:")
 	except getopt.GetoptError as err:
 		print(str(err))
 		usage()
 		sys.exit(2)
+
+	if len(opts) == 0:
+		usage()
+		print()
+		list(devices)
 
 	# Handle command line.
 	for o, a in opts:
@@ -89,14 +108,22 @@ def main():
 			if not checkport(dev, p):
 				break
 			relayctl.switchoff(dev, p)
+			status(dev)
+		elif o == "-g":
+			status(dev)
 		elif o == "-h":
 			usage()
 			print()
+		elif o == "-k":
+			relayctl.disable(dev)
 		elif o == "-o":
 			p = int(a)
 			if not checkport(dev, p):
 				break
 			relayctl.switchon(dev, p)
+			status(dev)
+		elif o == "-s":
+			list(devices)
 		elif o == "-t":
 			p = int(a)
 			if not checkport(dev, p):
@@ -105,47 +132,45 @@ def main():
 				relayctl.switchon(dev, p)
 			else:
 				relayctl.switchoff(dev, p)
+			status(dev)
 		else:
 			break
-
-	# Always output the device status.
-	status(devices)
 
 	# Workaround for bug in old version of usb library.
 	devices = None
 
-def status(devices):
+def status(dev):
 	"""
-	Outputs the status of all devices.
+	Outputs the status of a device.
 
-	@param devices list of devices
+	@param dev device
 	"""
 
-	print("Status overview");
-
-	for dev in devices:
-		print('device {}'.format(devices.index(dev)), end=", ")
-		# Print device id.
-		print('id {}'.format(relayctl.getid(dev)))
-		# Print status of all outlets.
-		for i in range(relayctl.getminport(dev),
-			       1 + relayctl.getmaxport(dev)):
-			print('\tstatus[{}] = {}'.format(i,
-			      relayctl.getstatus(dev, i)))
+	# Print device id.
+	print('id {}'.format(relayctl.getid(dev)))
+	# Print status of all outlets.
+	for i in range(relayctl.getminport(dev),
+		       1 + relayctl.getmaxport(dev)):
+		print('\tstatus[{}] = {}'.format(i,
+		      relayctl.getstatus(dev, i)))
 
 def usage():
 	"""
 	Outputs the online help.
 	"""
-	print("Usage: relctl.py [OPTIONS]")
-	print("Switches Enermax USB controlled plugstrips")
+
+	print( "Usage: relctl.py [OPTIONS]")
+	print( "Switches FTDI relay boards")
 	print()
-	print("  -D ID	       id of device to be controlled")
-	print("  -d DEVICE     index of device to be controlled")
-	print("  -f OUTLET     switch outlet off")
-	print("  -h	       print this help")
-	print("  -o OUTLET     switch outlet on")
-	print("  -t OUTLET     toggle outlet")
+	print( "  -D ID	id of device to be controlled")
+	print( "  -d DEVICE     index of device to be controlled")
+	print( "  -f OUTLET     switch outlet off")
+	print( "  -g            get status")
+	print( "  -h            print this help")
+	print( "  -k            attach kernel driver")
+	print( "  -o OUTLET     switch outlet on")
+	print( "  -s            list available devices")
+	print( "  -t OUTLET     toggle outlet")
 
 if __name__ == "__main__":
 	main()
