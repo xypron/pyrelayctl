@@ -111,9 +111,9 @@ def getid(dev):
 	"""
 
 	if 0 == len(dev.langids):
-		return "unknown"
-	
-	langid = dev.langids[0]
+		langid = 0
+	else:
+		langid = dev.langids[0]
 
 	return usb.util.get_string(dev, 3, langid)
 
